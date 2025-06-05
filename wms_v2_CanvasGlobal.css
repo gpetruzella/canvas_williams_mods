@@ -32,8 +32,8 @@
 }
 
 .wms_roster_user:hover {
-	border: 1px solid #0096db;
-	background-color: #0096db;
+	border: 1px solid #007bab; /* Adjusted border color */
+	background-color: #007bab; /* Adjusted background color for 4.55:1 contrast with #FFF */
 	color: #FFF;
 }
 
@@ -89,6 +89,11 @@
 	margin: 0 !important;
 }
 
+/* Utility class used by JavaScript to hide elements */
+.hide {
+    display: none !important;
+}
+
 .wmsPresenterExit {
 	z-index: 1000 !important;
 	position: fixed;
@@ -111,7 +116,6 @@
 	position: absolute;
 	top: 350px;
 	-webkit-transform: rotate(-90deg);
-	-ff-transform: rotate(-90deg);
 	transform: rotate(-90deg);
 	width: 20px;
 	font-weight: bold;
@@ -125,11 +129,6 @@
 /*********************************************
 Tested the accessibility of the color contrast of #666666 on white and it works, so these warnings can be safely ignored.
  */
-
-/*remove Canvas gradient*/
-/* gcp1 comment: doesn't change white bg to grey anyway... .ic-Login-Body {
-	background: none no-repeat #F0F0F0 !important;
-}*/
 
 /*use custom logo and resize the login box*/
 .ic-Login {
@@ -174,15 +173,16 @@ Tested the accessibility of the color contrast of #666666 on white and it works,
     display: inline-block;
 }
 
-#pseudonym_session_unique_id, #pseudonym_session_password {
-	width: 235px !important;
-	height: 56px !important;
-	background: #EDEBE9 no-repeat !important;
-	border: 6px solid #f1f0ee !important;
-	box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.4) !important;
-	outline: none !important;
-	color: #303030 !important;
-	font-size: 96% !important;
+#pseudonym_session_unique_id,
+#pseudonym_session_password {
+    width: 235px !important;
+    height: 56px !important;
+    background: #EDEBE9 no-repeat !important;
+    border: 6px solid #f1f0ee !important;
+    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.4) !important;
+    outline: none !important;
+    color: #303030 !important;
+    font-size: 96% !important;
 }
 
 .Button--login:hover {
@@ -305,18 +305,19 @@ LI A#global_nav_conversations_link {
 }
 
 /*extend existing partial horizontal rule to boundary edges*/
+.wmsBreadCrumbsLine,
+.wmsFooterLine {
+    margin: 0 !important;
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
 .wmsBreadCrumbsLine {
-	border-bottom: 1px solid #d6d6d6 !important;
-	margin: 0 !important;
-	padding-left: 24px;
-	padding-right: 24px;
+    border-bottom: 1px solid #d6d6d6 !important;
 }
 
 .wmsFooterLine {
-	border-top: 1px solid #d6d6d6 !important;
-	margin: 0 !important;
-	padding-left: 24px;
-	padding-right: 24px;
+    border-top: 1px solid #d6d6d6 !important;
 }
 
 #wms_presenter_breadcrumb > a > i {
