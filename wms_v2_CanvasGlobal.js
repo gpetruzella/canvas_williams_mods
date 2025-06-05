@@ -24,6 +24,11 @@ document.addEventListener('DOMContentLoaded', function() {
                             const modalTitle = document.querySelector("#ui-id-1.ui-dialog-title");
                             if (modalTitle) {
                                 modalTitle.textContent = "Faculty rely on photos to learn student names. Please consider using a photo that clearly shows your face.";
+                                // Ensure aria-labelledby points to the updated title element
+                                const modalDialog = modalTitle.closest('[role="dialog"]');
+                                if (modalDialog && modalTitle.id) {
+                                    modalDialog.setAttribute('aria-labelledby', modalTitle.id);
+                                }
                                 observerInstance.disconnect(); // Stop observing once the modal is found and updated
                                 break;
                             }
@@ -35,7 +40,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 const profileModalObserver = new MutationObserver(callback);
 
                 // Start observing the target node for configured mutations
-                profileModalObserver.observe(document.body, observerOptions);
+                if (document.body) {
+                    profileModalObserver.observe(document.body, observerOptions);
+                } else {
+                    console.warn("Profile modal observer: document.body not found at the time of observation setup.");
+                }
             });
         });
     }
@@ -119,6 +128,17 @@ function debounce(func, delay) {
             const rosterShuffleLink = document.getElementById("wms_roster_shuffle");
             const originalRosterTable = document.querySelector("#content TABLE.roster.ic-Table");
 
+            if (learningButton) {
+                learningButton.setAttribute('aria-pressed', 'false'); // Initial state
+            }
+            if (rosterToggleNamesLink) {
+                rosterToggleNamesLink.setAttribute('role', 'button');
+                // Initial aria-pressed state will be set when learning mode is activated
+            }
+            if (rosterShuffleLink) {
+                rosterShuffleLink.setAttribute('role', 'button');
+            }
+
             // Click handler for the main "Shuffle" link
             const handleShuffleClick = (event) => {
                 event.preventDefault();
@@ -135,9 +155,16 @@ function debounce(func, delay) {
                     if (toggleState) {
                         // ---- Turn Learning Mode ON ----
                         learningButton.innerHTML = "<i class=\"icon-user\"></i> Return to List";
+                        learningButton.setAttribute('aria-pressed', 'true');
 
                         rosterToggleNamesLink.textContent = "Turn Learning Mode On";
                         rosterToggleNamesLink.setAttribute("title", "Hide names");
+                        // Set initial aria-pressed for toggleNames when learning mode is ON
+                        // Names are initially hidden, so "Turn Learning Mode Off" (to show names) means it's pressed.
+                        // The text "Turn Learning Mode Off" implies the current state is "Learning Mode ON (names hidden)"
+                        // So, if button text is "Turn Learning Mode Off", aria-pressed should be true.
+                        rosterToggleNamesLink.setAttribute('aria-pressed', 'true');
+
 
                         let toggleNamesState = true; // true = Names hidden by default, false = Names shown
 
@@ -152,19 +179,39 @@ function debounce(func, delay) {
                                 // Change to: Names visible by default
                                 rosterToggleNamesLink.textContent = "Turn Learning Mode On";
                                 rosterToggleNamesLink.setAttribute("title", "Hide names");
-                                allSmallNameElements.forEach(small => small.classList.remove("hide"));
+                                rosterToggleNamesLink.setAttribute('aria-pressed', 'false');
+                                allSmallNameElements.forEach(small => {
+                                    small.classList.remove("hide");
+                                    small.removeAttribute('aria-hidden');
+                                });
                                 rosterUsers.forEach(user => {
-                                    user.onmouseenter = () => user.querySelectorAll("small").forEach(s => s.classList.remove("hide"));
-                                    user.onmouseleave = () => user.querySelectorAll("small").forEach(s => s.classList.remove("hide"));
+                                    user.onmouseenter = () => user.querySelectorAll("small").forEach(s => {
+                                        s.classList.remove("hide");
+                                        s.removeAttribute('aria-hidden');
+                                    });
+                                    user.onmouseleave = () => user.querySelectorAll("small").forEach(s => {
+                                        s.classList.remove("hide");
+                                        s.removeAttribute('aria-hidden');
+                                    });
                                 });
                             } else {
                                 // Change to: Names hidden by default (hover to show)
                                 rosterToggleNamesLink.textContent = "Turn Learning Mode Off";
                                 rosterToggleNamesLink.setAttribute("title", "Show names");
-                                allSmallNameElements.forEach(small => small.classList.add("hide"));
+                                rosterToggleNamesLink.setAttribute('aria-pressed', 'true');
+                                allSmallNameElements.forEach(small => {
+                                    small.classList.add("hide");
+                                    small.setAttribute('aria-hidden', 'true');
+                                });
                                 rosterUsers.forEach(user => {
-                                    user.onmouseenter = () => user.querySelectorAll("small").forEach(s => s.classList.remove("hide"));
-                                    user.onmouseleave = () => user.querySelectorAll("small").forEach(s => s.classList.add("hide"));
+                                    user.onmouseenter = () => user.querySelectorAll("small").forEach(s => {
+                                        s.classList.remove("hide");
+                                        s.removeAttribute('aria-hidden');
+                                    });
+                                    user.onmouseleave = () => user.querySelectorAll("small").forEach(s => {
+                                        s.classList.add("hide");
+                                        s.setAttribute('aria-hidden', 'true');
+                                    });
                                 });
                             }
                             toggleNamesState = !toggleNamesState;
@@ -172,8 +219,9 @@ function debounce(func, delay) {
 
                         // Initial setup for "Toggle Names" link when learning mode is first activated:
                         // Names are hidden by default, hover reveals them.
-                        rosterToggleNamesLink.textContent = "Turn Learning Mode Off";
+                        rosterToggleNamesLink.textContent = "Turn Learning Mode Off"; // Button action is to turn it OFF (show names)
                         rosterToggleNamesLink.setAttribute("title", "Show names");
+                        rosterToggleNamesLink.setAttribute('aria-pressed', 'true'); // Currently "ON" (names hidden)
 
                         // The roster grid is created here, so we apply initial hide and hover after its creation.
                         // (Code for creating 'createGrid' follows)
@@ -201,20 +249,30 @@ function debounce(func, delay) {
                                 createGrid += `<div class="wms_roster_user">${user_info}</div>`;
                             }
                         });
-                        createGrid = `<div id="wms_roster_grid">${createGrid}</div>`;
+                        createGrid = `<div id="wms_roster_grid" role="group" aria-label="User Roster Grid">${createGrid}</div>`;
 
                         originalRosterTable.insertAdjacentHTML('beforebegin', createGrid);
 
                         // After grid is created, apply initial name visibility and hover effects
-                        document.querySelectorAll("#wms_roster_grid .wms_roster_user small").forEach(small => small.classList.add("hide"));
+                        document.querySelectorAll("#wms_roster_grid .wms_roster_user small").forEach(small => {
+                            small.classList.add("hide");
+                            small.setAttribute('aria-hidden', 'true');
+                        });
                         document.querySelectorAll("#wms_roster_grid .wms_roster_user").forEach(user => {
-                            user.onmouseenter = () => user.querySelectorAll("small").forEach(s => s.classList.remove("hide"));
-                            user.onmouseleave = () => user.querySelectorAll("small").forEach(s => s.classList.add("hide"));
+                            user.onmouseenter = () => user.querySelectorAll("small").forEach(s => {
+                                s.classList.remove("hide");
+                                s.removeAttribute('aria-hidden');
+                            });
+                            user.onmouseleave = () => user.querySelectorAll("small").forEach(s => {
+                                s.classList.add("hide");
+                                s.setAttribute('aria-hidden', 'true');
+                            });
                         });
                         toggleNamesState = true; // Reflects that names are initially hidden
 
                         // ---- Shuffle Controls ----
                         shuffleDelimiter.classList.remove("hide");
+                        shuffleDelimiter.removeAttribute('aria-hidden');
                         rosterShuffleLink.textContent = "Shuffle";
                         rosterShuffleLink.setAttribute("title", "Reorder the roster");
                         rosterShuffleLink.addEventListener('click', handleShuffleClick);
@@ -225,10 +283,12 @@ function debounce(func, delay) {
                         // ---- Turn Learning Mode OFF ----
                         learningButton.innerHTML = "<i class=\"icon-user\"></i> Show Face Book";
                         learningButton.setAttribute("title", "(Photos viewable on-campus or via VPN)");
+                        learningButton.setAttribute('aria-pressed', 'false');
 
                         // Clear and remove "Toggle Names" functionality
                         rosterToggleNamesLink.textContent = "";
                         rosterToggleNamesLink.setAttribute("title", "");
+                        rosterToggleNamesLink.removeAttribute('aria-pressed'); // Clear aria-pressed
                         if (learningButton._handleToggleNamesClick) {
                             rosterToggleNamesLink.removeEventListener('click', learningButton._handleToggleNamesClick);
                             delete learningButton._handleToggleNamesClick;
@@ -242,6 +302,7 @@ function debounce(func, delay) {
 
                         // Clear and remove "Shuffle" functionality
                         shuffleDelimiter.classList.add("hide");
+                        shuffleDelimiter.setAttribute('aria-hidden', 'true');
                         rosterShuffleLink.textContent = "";
                         rosterShuffleLink.setAttribute("title", "");
                         if (learningButton._handleShuffleClick) {
@@ -296,9 +357,19 @@ function debounce(func, delay) {
 	 * @return {Void}
 	 * Original author of scalePage function: http://binarystash.blogspot.com/2013/04/scaling-entire-page-through-css3.html
 	 */
-	function scalePage(minWidth) {
-		// Check parameters
-		if (minWidth === "" || typeof minWidth === 'undefined') {
+// Variable to store the debounced resize handler for presenter mode scaling
+let originalResizeHandler = null;
+
+/*
+ * START: Scale a page using CSS3
+ * @param minWidth {Number} The width of your wrapper or your page's minimum width.
+ * @return {Void}
+ * Original author of scalePage function: http://binarystash.blogspot.com/2013/04/scaling-entire-page-through-css3.html
+ * Modified for Williams College Glow system.
+ */
+function scalePage(minWidth) {
+    // Check parameters
+    if (minWidth === "" || typeof minWidth === 'undefined') {
 			console.log("scalePage: minWidth not defined. Exiting");
 			return;
 		}
@@ -366,7 +437,12 @@ function debounce(func, delay) {
 
 		scalePageNow(); // Apply scaling immediately
         // Add debounced resize listener to re-apply scaling on window resize
-		window.addEventListener('resize', debounce(scalePageNow, 250));
+        // Store the handler so it can be removed later
+        if (originalResizeHandler) { // Remove any existing handler before adding a new one
+            window.removeEventListener('resize', originalResizeHandler);
+        }
+        originalResizeHandler = debounce(scalePageNow, 250);
+		window.addEventListener('resize', originalResizeHandler);
 
         // Helper function to detect touch devices
 		function isTouchDevice() {
@@ -379,7 +455,7 @@ function debounce(func, delay) {
 	if (!window.location.href.match(/\/external_tools/ig)) {
 		const breadcrumbs = document.querySelector("NAV#breadcrumbs");
 		if (breadcrumbs) {
-			breadcrumbs.insertAdjacentHTML('afterend', '<div id="wms_presenter_breadcrumb"><a href="#" class="btn btn-primary icon-none" title="Enable Presenter View">&nbsp;Presenter&nbsp;View</a></div>');
+			breadcrumbs.insertAdjacentHTML('afterend', '<div id="wms_presenter_breadcrumb"><a href="#" class="btn btn-primary icon-none" title="Enable Presenter View" role="button" aria-pressed="false">&nbsp;Presenter&nbsp;View</a></div>');
 		}
 		const applicationDiv = document.getElementById("application");
 		if (applicationDiv) {
@@ -387,45 +463,186 @@ function debounce(func, delay) {
 		}
 	}
 
+// Function to reverse the changes made by Presenter View
+function exitPresenterMode() {
+    // Restore body class if it was changed (e.g., for menu state)
+    // document.body.classList.add("course-menu-expanded"); // Example, check actual default or desired state
+
+    const presenterBreadcrumbBtn = document.getElementById('wms_presenter_breadcrumb');
+    if (presenterBreadcrumbBtn) presenterBreadcrumbBtn.classList.remove("wmsDisplayNone");
+
+    const header = document.querySelector("HEADER");
+    if (header) header.classList.remove("wmsDisplayNone");
+
+    const appNavToggle = document.querySelector(".ic-app-nav-toggle-and-crumbs");
+    if (appNavToggle) appNavToggle.classList.remove("wmsDisplayNone");
+
+    const leftSide = document.getElementById("left-side");
+    if (leftSide) leftSide.classList.remove("wmsDisplayNone");
+
+    const rightSideWrapper = document.getElementById("right-side-wrapper");
+    if (rightSideWrapper) rightSideWrapper.classList.remove("wmsDisplayNone");
+
+    const mainContent = document.getElementById("main");
+    if (mainContent) {
+        mainContent.classList.remove("wmsMarginZero");
+        mainContent.style.cssText = ""; // Clear inline styles or restore to a known previous state
+    }
+
+    const wrapperContainer = document.getElementById("wrapper-container");
+    if (wrapperContainer) wrapperContainer.classList.remove("wmsMarginZero");
+
+    const mainLayoutHorizontal = document.querySelector(".ic-app-main-layout-horizontal");
+    if (mainLayoutHorizontal) mainLayoutHorizontal.classList.remove("wmsMarginZero");
+
+    // Reversing scalePage effects
+    const boundary = document.getElementById('resizer-boundary');
+    const superContainer = document.getElementById('resizer-supercontainer');
+    const parentElem = document.getElementById("wrapper-container"); // This was parentElem in scalePage
+
+    if (boundary && superContainer && parentElem) {
+        // Clear transform styles from superContainer
+        superContainer.style.transform = "";
+        superContainer.style.transformOrigin = "";
+        superContainer.style.msTransform = "";
+        superContainer.style.msTransformOrigin = "";
+        superContainer.style.MozTransform = "";
+        superContainer.style.MozTransformOrigin = "";
+        superContainer.style.OTransform = "";
+        superContainer.style.OTransformOrigin = "";
+        superContainer.style.webkitTransform = "";
+        superContainer.style.webkitTransformOrigin = "";
+        superContainer.style.width = "";
+
+        // Clear styles from boundary
+        boundary.style.height = "";
+        boundary.style.position = "";
+        boundary.style.overflow = "";
+
+        // Move children from superContainer back to parentElem (wrapper-container)
+        // Ensure parentElem is the direct parent of boundary before removing boundary
+        if (boundary.parentNode === parentElem) {
+            while (superContainer.firstChild) {
+                parentElem.appendChild(superContainer.firstChild);
+            }
+            parentElem.removeChild(boundary); // Removes boundary and its child superContainer
+        } else if (superContainer.parentNode === boundary) {
+            // Fallback if boundary is not child of parentElem for some reason, but superContainer is child of boundary
+            // This case implies parentElem is not the direct parent of boundary.
+            // We should try to move children of superContainer to boundary's original position if possible,
+            // but the safest here is to just remove the elements if their structure isn't as expected.
+            // For now, we assume boundary.parentNode is parentElem.
+            // If not, a more complex DOM restoration might be needed, or simply remove the created elements.
+            console.warn("Presenter View exit: resizer-boundary's parent is not wrapper-container. DOM restoration might be incomplete.");
+            // Attempt to move children to wrapper-container if superContainer still has them
+             while (superContainer.firstChild) {
+                parentElem.appendChild(superContainer.firstChild);
+            }
+            if(boundary.parentNode){
+                boundary.parentNode.removeChild(boundary);
+            } else {
+                 boundary.remove(); // if it has no parent somehow
+            }
+        } else {
+            // If elements are not structured as expected, log and potentially just remove them.
+            console.warn("Presenter View exit: resizer-boundary or resizer-supercontainer structure unexpected. Removing them directly.");
+            if (boundary) boundary.remove();
+            if (superContainer) superContainer.remove(); // Should be removed with boundary if child
+        }
+    } else {
+        console.warn("Presenter View exit: Did not find all resizer elements (boundary, superContainer, parentElem).");
+    }
+
+    // Remove the resize event listener
+    if (originalResizeHandler) {
+        window.removeEventListener('resize', originalResizeHandler);
+        originalResizeHandler = null;
+    }
+
+    // Hide the exit button for Presenter View
+    const exitBtn = document.getElementById('wms_presenter_exit_btn');
+    if (exitBtn) exitBtn.classList.remove("wmsPresenterExit");
+
+    const exitBtnText = document.getElementById('wms_presenter_exit_text');
+    if (exitBtnText) exitBtnText.classList.add("wmsDisplayNone");
+
+    // Ensure the Presenter View toggle button is reset
+    const presenterBtnLink = document.querySelector('#wms_presenter_breadcrumb a.btn');
+    if (presenterBtnLink) {
+         presenterBtnLink.setAttribute('aria-pressed', 'false');
+    }
+}
+
+
 	// Event listener for exiting Presenter View
 	const presenterExitBtn = document.getElementById('wms_presenter_exit_btn');
 	if (presenterExitBtn) {
 		presenterExitBtn.addEventListener('click', function () {
-			location.reload(); // Simple page reload to exit
+			// location.reload(); // Simple page reload to exit
+            exitPresenterMode();
 		});
 	}
 
 	// Event listener for enabling Presenter View
 	const presenterBreadcrumbBtn = document.getElementById('wms_presenter_breadcrumb');
 	if (presenterBreadcrumbBtn) {
-		presenterBreadcrumbBtn.addEventListener('click', function () {
+		const presenterBtnLink = presenterBreadcrumbBtn.querySelector('a.btn'); // Get the actual link
+		presenterBreadcrumbBtn.addEventListener('click', function (event) {
+			event.preventDefault(); // Prevent default anchor action
 			document.body.classList.remove("course-menu-expanded");
 
 			if (presenterBreadcrumbBtn) presenterBreadcrumbBtn.classList.add("wmsDisplayNone");
+			if (presenterBtnLink) presenterBtnLink.setAttribute('aria-pressed', 'true');
 
 			const header = document.querySelector("HEADER");
-			if (header) header.classList.add("wmsDisplayNone");
+			if (header) {
+                            header.classList.add("wmsDisplayNone");
+                        } else {
+                            console.warn("Presenter View: HEADER element not found.");
+                        }
 
 			const appNavToggle = document.querySelector(".ic-app-nav-toggle-and-crumbs");
-			if (appNavToggle) appNavToggle.classList.add("wmsDisplayNone");
+			if (appNavToggle) {
+                            appNavToggle.classList.add("wmsDisplayNone");
+                        } else {
+                            console.warn("Presenter View: .ic-app-nav-toggle-and-crumbs element not found.");
+                        }
 
 			const leftSide = document.getElementById("left-side");
-			if (leftSide) leftSide.classList.add("wmsDisplayNone");
+			if (leftSide) {
+                            leftSide.classList.add("wmsDisplayNone");
+                        } else {
+                            console.warn("Presenter View: #left-side element not found.");
+                        }
 
 			const rightSideWrapper = document.getElementById("right-side-wrapper");
-			if (rightSideWrapper) rightSideWrapper.classList.add("wmsDisplayNone");
+			if (rightSideWrapper) {
+                            rightSideWrapper.classList.add("wmsDisplayNone");
+                        } else {
+                            console.warn("Presenter View: #right-side-wrapper element not found.");
+                        }
 
 			const mainContent = document.getElementById("main");
 			if (mainContent) {
 				mainContent.classList.add("wmsMarginZero");
 				mainContent.style.cssText = "padding-left: 25px;max-width: 900px !important;";
-			}
+			} else {
+                            console.warn("Presenter View: #main element not found.");
+                        }
 
 			const wrapperContainer = document.getElementById("wrapper-container");
-			if (wrapperContainer) wrapperContainer.classList.add("wmsMarginZero");
+			if (wrapperContainer) {
+                            wrapperContainer.classList.add("wmsMarginZero");
+                        } else {
+                            console.warn("Presenter View: #wrapper-container element not found.");
+                        }
 
 			const mainLayoutHorizontal = document.querySelector(".ic-app-main-layout-horizontal");
-			if (mainLayoutHorizontal) mainLayoutHorizontal.classList.add("wmsMarginZero");
+			if (mainLayoutHorizontal) {
+                            mainLayoutHorizontal.classList.add("wmsMarginZero");
+                        } else {
+                            console.warn("Presenter View: .ic-app-main-layout-horizontal element not found.");
+                        }
 
 			// Commented out: Force image zoom behavior
 			// const images = document.querySelectorAll("IMG");

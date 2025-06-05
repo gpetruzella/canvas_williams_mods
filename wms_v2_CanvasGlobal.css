@@ -1,3 +1,26 @@
+:root {
+    --wms-primary-accent: #007bab;
+    --wms-white: #FFFFFF;
+    --wms-presenter-exit-bg: #0072A8;
+    --wms-presenter-exit-hover-bg: #00628E;
+    --wms-presenter-exit-border: #006796;
+    --wms-presenter-exit-hover-border: #006594;
+    --wms-border-light-gray: #CCCCCC;
+    --wms-roster-user-bg: #F8FAFB;
+    --wms-text-dark-gray: #333333;
+    --wms-login-text-gray: #666666;
+    --wms-login-input-bg: #EDEBE9;
+    --wms-login-input-text-color: #303030;
+    --wms-login-button-hover-bg: #500082;
+    --wms-login-button-hover-border: #FFBE0A;
+    --wms-internal-page-divider-gray: #f0f0f0;
+    --wms-rule-gray: #d6d6d6;
+
+    --wms-roster-grid-gap: 8px;
+    --wms-standard-padding: 24px;
+    --wms-login-main-bg: #FFFFFF; /* for .ic-Login background */
+}
+
 /**********************************************
 ** People: Add Face Book and Learning Mode
 ***********************************************/
@@ -6,24 +29,58 @@
 	display: block !important;
 }
 
+/* Styles for the roster grid container */
+#wms_roster_grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around; /* Distribute items evenly with space around them */
+    gap: var(--wms-roster-grid-gap); /* Spacing between grid items */
+    padding: var(--wms-roster-grid-gap); /* Optional: padding for the grid container itself */
+}
+
 .wms_roster_user {
-	float: left;
-	width: 124px;
-	height: 190px;
-	margin-right: 8px;
-	margin-bottom: 8px;
-	border: 1px solid #CCCCCC;
-	background-color: #F8FAFB;
-	color: #333333;
+	/* float: left; -- REMOVE float for flexbox */
+	width: 124px; /* Base width, can be overridden by flex properties */
+	flex-grow: 1; /* Allow items to grow */
+	flex-basis: 120px; /* Minimum width before wrapping/growing */
+	max-width: 150px; /* Prevent items from becoming too large */
+	height: 190px; /* Keep fixed height or make it auto? For now, keep. */
+	/* margin-right: 8px; -- REMOVE, handled by gap */
+	/* margin-bottom: 8px; -- REMOVE, handled by gap */
+	border: 1px solid var(--wms-border-light-gray);
+	background-color: var(--wms-roster-user-bg);
+	color: var(--wms-text-dark-gray);
 	padding: 4px;
 	position: relative;
+	display: flex; /* For aligning content within the card */
+	flex-direction: column;
+	align-items: center; /* Center content horizontally */
+	box-sizing: border-box; /* Ensure padding and border are included in width/height */
 }
 
 /* gcp1 add: embiggen user avatars in Face Book*/
-.wms_roster_user span {
+.wms_roster_user span { /* This is the avatar container */
     width: 110px;
     height: 110px;
+    display: flex; /* For centering image if it's an img tag */
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; /* Ensure content doesn't spill if image is larger */
 }
+
+.wms_roster_user span img { /* Assuming avatar is an img inside the span from Canvas */
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Styling for text elements within roster user cards */
+.wms_roster_user small {
+    text-align: center;
+    width: 100%; /* Ensure text wraps and uses available width */
+    margin-top: 4px; /* Add some space between elements */
+}
+
 
 /* gcp1 add: fix 'bleed-over' of Pending status on user card in Face Book*/
 .wms_roster_user .label {
@@ -32,17 +89,23 @@
 }
 
 .wms_roster_user:hover {
-	border: 1px solid #007bab; /* Adjusted border color */
-	background-color: #007bab; /* Adjusted background color for 4.55:1 contrast with #FFF */
-	color: #FFF;
+	border: 1px solid var(--wms-primary-accent); /* Adjusted border color */
+	background-color: var(--wms-primary-accent); /* Adjusted background color for 4.55:1 contrast with #FFF */
+	color: var(--wms-white);
 }
 
 .wms_roster_user:hover A {
-	color: #FFF;
+	color: var(--wms-white);
 }
 
 #wms_roster_btn_learning {
 	outline: 0;
+}
+
+#wms_roster_btn_learning:focus {
+	box-shadow: 0 0 0 2px Highlight, 0 0 0 4px #000000; /* WCAG 2.4.7: Added visible focus indicator */
+	/* Fallback for browsers that don't support Highlight system color: */
+	/* box-shadow: 0 0 0 2px #2587DC, 0 0 0 4px #000000; */ /* A common blue focus color */
 }
 
 .wms_wso_link {
@@ -100,15 +163,15 @@
 	top: 0;
 	left: 0;
 	cursor: pointer;
-	background-color: #0096db;
-	border: 1px solid #006796;
+	background-color: var(--wms-presenter-exit-bg); /* WCAG AA: Changed from #0096db for better contrast with #FFFFFF text */
+	border: 1px solid var(--wms-presenter-exit-border);
 	width: 20px;
 	height: 100%;
 }
 
 .wmsPresenterExit:hover {
-	background-color: #0085c2;
-	border: 1px solid #006594;
+	background-color: var(--wms-presenter-exit-hover-bg); /* WCAG AA: Changed from #0085c2 for better contrast with #FFFFFF text */
+	border: 1px solid var(--wms-presenter-exit-hover-border);
 }
 
 /*Rotate internal text of "exit button"*/
@@ -119,7 +182,7 @@
 	transform: rotate(-90deg);
 	width: 20px;
 	font-weight: bold;
-	color: #FFFFFF;
+	color: var(--wms-white);
 }
 
 /**********************************************
@@ -132,18 +195,26 @@ Tested the accessibility of the color contrast of #666666 on white and it works,
 
 /*use custom logo and resize the login box*/
 .ic-Login {
-	background: #FFFFFF url("https://apps.williams.edu/glow/images/custom-login-image.jpg") no-repeat center top / 1140px 400px !important;
+	background-color: var(--wms-login-main-bg); /* Ensure fallback background color */
+	background-image: url("https://apps.williams.edu/glow/images/custom-login-image.jpg");
+	background-repeat: no-repeat;
+	background-position: center top;
+	background-size: cover; /* Make background responsive */
 	margin: 0 auto !important;
-	width: 1140px !important;
-	/** height: 675px !important; **/
+	max-width: 1140px; /* Max width */
+	width: 100%; /* Responsive width */
+	padding-top: 150px; /* Adjust as needed, replaces part of container margin */
+	/** height: 675px !important; -- Avoid fixed height for responsiveness **/
 }
 
 .ic-Login__container {
-	margin: 390px 0 0 0 !important;
+	margin: 50px 0 0 0 !important; /* Reduced top margin, adjust as needed */
 }
 
 .ic-Login__content {
-	width: 490px !important;
+	max-width: 490px; /* Max width for content */
+	width: 90%; /* Responsive width for content */
+	margin: 0 auto; /* Center content */
 	border: 0 none !important;
 	padding: 0 !important;
 }
@@ -163,7 +234,7 @@ Tested the accessibility of the color contrast of #666666 on white and it works,
 
 /*change: color of text, links, labels, decrease font size*/
 #login_form, #login_form A, #login_form LABEL {
-	color: #666666 !important;
+	color: var(--wms-login-text-gray) !important;
 	font-size: 96% !important;
 	font-weight: normal;
 }
@@ -171,24 +242,25 @@ Tested the accessibility of the color contrast of #666666 on white and it works,
 /* gcp1 add: side-by-side UN/PW fields */
 .ic-Form-control--login {
     display: inline-block;
+    margin: 5px; /* Add some margin for spacing */
 }
 
 #pseudonym_session_unique_id,
 #pseudonym_session_password {
     width: 235px !important;
     height: 56px !important;
-    background: #EDEBE9 no-repeat !important;
-    border: 6px solid #f1f0ee !important;
+    background: var(--wms-login-input-bg) no-repeat !important;
+    border: 6px solid #f1f0ee !important; /* This color is very light, consider a variable if used elsewhere or make it derived from input-bg */
     box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.4) !important;
     outline: none !important;
-    color: #303030 !important;
+    color: var(--wms-login-input-text-color) !important;
     font-size: 96% !important;
 }
 
 .Button--login:hover {
-	border: 1px solid #FFBE0A;
-	background-color: #500082;
-	color: #FFF;
+	border: 1px solid var(--wms-login-button-hover-border);
+	background-color: var(--wms-login-button-hover-bg);
+	color: var(--wms-white);
 }
 
 .ic-Login__actions {
@@ -232,12 +304,13 @@ P#wms-login-footer {
 
 /*custom footer link color*/
 P#wms-login-footer A {
-	color: #666666 !important;
+	color: var(--wms-login-text-gray) !important;
 }
 
 /*error alert message holder: set to same width as your login-box above*/
 #unauthorized_holder {
-	width: 1140px !important;
+	max-width: 1140px; /* Max width */
+	width: 100%; /* Responsive width */
 }
 
 /*error alert message: remove box shadow*/
@@ -247,13 +320,62 @@ P#wms-login-footer A {
 	margin: 0 auto 0 !important;
 }
 
+/* Media query for responsive login form elements */
+@media (max-width: 600px) { /* Adjust breakpoint as needed */
+    .ic-Login__container {
+        margin-top: 20px !important; /* Further reduce margin for smaller screens */
+    }
+    .ic-Login__content {
+        width: 95%; /* Increase width for very small screens */
+    }
+    .ic-Form-control--login {
+        display: block; /* Stack them */
+        margin: 10px auto; /* Center them if desired, adjust margin */
+    }
+    #pseudonym_session_unique_id,
+    #pseudonym_session_password {
+        width: 90% !important; /* Make them take more width */
+        max-width: 300px; /* Optional: cap max width */
+        margin-left: auto !important; /* Ensure auto margins apply */
+        margin-right: auto !important;
+    }
+    .Button--login { /* Adjust login button position for stacked layout */
+        position: static !important; /* Reset absolute positioning */
+        display: block;
+        margin: 20px auto !important;
+        width: 90% !important;
+        max-width: 300px;
+    }
+    #login_forgot_password { /* Adjust forgot password link */
+         margin: 10px 0 !important;
+         float: none !important;
+         text-align: center;
+         display: block;
+    }
+    #pseudonym_session_remember_me { /* Adjust remember me checkbox */
+        margin: 10px auto !important; /* Centered */
+        display: block;
+        text-align: center;
+        width: 90%;
+        max-width: 300px;
+    }
+    .ic-Login__actions { /* Ensure parent of remember_me and forgot_password allows block/center */
+        padding: 10px 0 0 0 !important; /* Reset padding */
+        display: block;
+        text-align: center;
+    }
+    #login_form .ic-Form-control--login { /* Reset the auto margin from L226 */
+        margin: 10px auto !important;
+    }
+}
+
 /**********************************************
 ** Customize UI: MOBILE LOGIN PAGE
 **********************************************/
 #f1_container {
-	background: #FFFFFF url("https://apps.williams.edu/glow/images/custom-mobile-login-image.jpg") no-repeat center top !important;
+	background: var(--wms-login-main-bg) url("https://apps.williams.edu/glow/images/custom-mobile-login-image.jpg") no-repeat center top !important;
 	background-size: 300px 132px !important;
-	color: #373737 !important;
+	color: var(--wms-text-dark-gray) !important; /* Was #373737, similar to #333333 */
 }
 
 #f1_card {
@@ -261,13 +383,13 @@ P#wms-login-footer A {
 }
 
 #login_form.front.face {
-	background: #FFFFFF no-repeat !important;
+	background: var(--wms-login-main-bg) no-repeat !important;
 	position: relative !important;
 }
 
 /*resize the input fields*/
 #login_form.front.face INPUT.input-block-level {
-	background: #EDEBE9 !important;
+	background: var(--wms-login-input-bg) !important;
 }
 
 /*adjust the login button (it picks up default characteristics, like bgcolor, from primary css file
@@ -291,12 +413,12 @@ P#wms-login-footer A {
 **********************************************/
 /*edit left column*/
 #left-side {
-	border-right: 1px solid #f0f0f0 !important;
+	border-right: 1px solid var(--wms-internal-page-divider-gray) !important;
 }
 
 /*edit right column*/
 #right-side-wrapper {
-	background-color: #f0f0f0;
+	background-color: var(--wms-internal-page-divider-gray);
 }
 
 /*hide the Canvas Inbox*/
@@ -308,16 +430,16 @@ LI A#global_nav_conversations_link {
 .wmsBreadCrumbsLine,
 .wmsFooterLine {
     margin: 0 !important;
-    padding-left: 24px;
-    padding-right: 24px;
+    padding-left: var(--wms-standard-padding);
+    padding-right: var(--wms-standard-padding);
 }
 
 .wmsBreadCrumbsLine {
-    border-bottom: 1px solid #d6d6d6 !important;
+    border-bottom: 1px solid var(--wms-rule-gray) !important;
 }
 
 .wmsFooterLine {
-    border-top: 1px solid #d6d6d6 !important;
+    border-top: 1px solid var(--wms-rule-gray) !important;
 }
 
 #wms_presenter_breadcrumb > a > i {
