@@ -359,7 +359,7 @@
 
         const resourcesLink = `
             <li class="menu-item">
-                <a id="wms_resources_icon" href="/users/${userId}/external_tools/481471" class="ic-app-header__menu-list-link">
+                <a id="wms_resources_icon" href="/users/1234567/external_tools/481471" class="ic-app-header__menu-list-link">
                     <div class="menu-item-icon-container" aria-hidden="true">
                         <img src="https://apps.williams.edu/glow/images/icon-williams-resources.png" alt="Williams Resources" title="Williams Resources" />
                     </div>
