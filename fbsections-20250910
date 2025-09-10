@@ -92,10 +92,16 @@
             const rosterRows = this.rosterTable.find('tbody tr.rosterUser');
 
             rosterRows.each((index, row) => {
-                const img = $(row).find('td:nth-child(1)').html();
-                const name = $(row).find('td:nth-child(2)').html();
-                const role = $(row).find('td:nth-child(6)').text();
-                const userDiv = $(`<div class="wms_roster_user">${img}<small>${name}</small><br /><small>${role}</small></div>`);
+                const imgHtml = $(row).find('td:nth-child(1)').html();
+                const nameHtml = $(row).find('td:nth-child(2)').html();
+                const roleText = $(row).find('td:nth-child(6)').text();
+
+                const userDiv = $('<div class="wms_roster_user"></div>');
+                userDiv.html(imgHtml);
+                userDiv.append($('<small></small>').html(nameHtml));
+                userDiv.append('<br />');
+                userDiv.append($('<small></small>').text(roleText));
+
                 grid.append(userDiv);
             });
 
@@ -359,7 +365,7 @@
 
         const resourcesLink = `
             <li class="menu-item">
-                <a id="wms_resources_icon" href="/users/1234567/external_tools/481471" class="ic-app-header__menu-list-link">
+                <a id="wms_resources_icon" href="/users/${userId}/external_tools/481471" class="ic-app-header__menu-list-link">
                     <div class="menu-item-icon-container" aria-hidden="true">
                         <img src="https://apps.williams.edu/glow/images/icon-williams-resources.png" alt="Williams Resources" title="Williams Resources" />
                     </div>
