@@ -1,4 +1,8 @@
 /**********************************************
+ * AUTHORS: Original version (David Keiser-Clark | dwk2) + updated version (Gerol Petruzella | gcp1 with Claude)
+ */
+
+/**********************************************
 ** People: Add Face Book and Learning Mode
 ***********************************************/
 
@@ -122,129 +126,190 @@
 ** Customize UI: LOGIN PAGE
 **********************************************/
 
-/*********************************************
-Tested the accessibility of the color contrast of #666666 on white and it works, so these warnings can be safely ignored.
- */
-
-/*remove Canvas gradient*/
-/* gcp1 comment: doesn't change white bg to grey anyway... .ic-Login-Body {
-	background: none no-repeat #F0F0F0 !important;
-}*/
-
-/*use custom logo and resize the login box*/
+/* Modern centered login layout using flexbox */
 .ic-Login {
-	background: #FFFFFF url("https://apps.williams.edu/glow/images/custom-login-image.jpg") no-repeat center top / 1140px 400px !important;
-	margin: 0 auto !important;
-	width: 1140px !important;
-	/** height: 675px !important; **/
+	/* Use flexbox for better centering */
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	min-height: 100vh;
+
+	/* Custom background with proper sizing */
+	background: #FFFFFF url("https://apps.williams.edu/glow/images/custom-login-image.jpg") no-repeat center top / contain;
+	background-size: 100% auto;
+	max-width: 1140px;
+	margin: 0 auto;
 }
 
+/* Center the login container vertically and horizontally */
 .ic-Login__container {
-	margin: 390px 0 0 0 !important;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-top: 400px;
+	width: 100%;
 }
 
+/* Clean content wrapper */
 .ic-Login__content {
-	width: 490px !important;
-	border: 0 none !important;
-	padding: 0 !important;
+	width: 100%;
+	max-width: 490px;
+	border: none;
+	padding: 0;
+	background: transparent;
 }
 
 .ic-Login__innerContent {
-	padding: 0 !important;
+	padding: 0;
 }
 
+/* Hide the default header */
 .ic-Login__header {
-	display: none !important;
+	display: none;
 }
 
+/* Login body spacing */
 .ic-Login__body {
-	margin-top: 47px !important;
-	padding: 0 !important;
+	margin-top: 2rem;
+	padding: 0;
 }
 
-/*change: color of text, links, labels, decrease font size*/
-#login_form, #login_form A, #login_form LABEL {
-	color: #666666 !important;
-	font-size: 96% !important;
+/* Form styling with better specificity (avoiding !important) */
+#login_form {
+	color: #666666;
+	font-size: 0.96rem;
+}
+
+#login_form a,
+#login_form label {
+	color: inherit;
 	font-weight: normal;
 }
 
-/* gcp1 add: side-by-side UN/PW fields */
-.ic-Form-control--login {
-    display: inline-block;
+/* Side-by-side form fields using flexbox */
+#login_form .ic-Form-control--login {
+	display: inline-flex;
+	gap: 10px;
+	margin-bottom: 1rem;
 }
 
-#pseudonym_session_unique_id, #pseudonym_session_password {
-	width: 235px !important;
-	height: 56px !important;
-	background: #EDEBE9 no-repeat !important;
-	border: 6px solid #f1f0ee !important;
-	box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.4) !important;
-	outline: none !important;
-	color: #303030 !important;
-	font-size: 96% !important;
+/* Input field styling with better cascade */
+#pseudonym_session_unique_id,
+#pseudonym_session_password {
+	width: 235px;
+	height: 56px;
+	padding: 0.75rem;
+	background-color: #EDEBE9;
+	border: 6px solid #f1f0ee;
+	box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.4);
+	outline: none;
+	color: #303030;
+	font-size: 0.96rem;
+	transition: border-color 0.3s ease;
 }
 
+#pseudonym_session_unique_id:focus,
+#pseudonym_session_password:focus {
+	border-color: #500082;
+}
+
+/* Button hover state */
 .Button--login:hover {
 	border: 1px solid #FFBE0A;
 	background-color: #500082;
 	color: #FFF;
 }
 
+/* Login actions layout using flexbox */
 .ic-Login__actions {
-	padding: 10px 0 0 5px !important;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 10px 0 0 5px;
+	flex-wrap: wrap;
 }
 
+/* Remember me checkbox positioning */
 #pseudonym_session_remember_me {
-	margin: -28px 0 0 0 !important;
+	margin-right: auto;
 }
 
-.ic-Login__actions-timeout>label {
-	margin: -13px 0 0 0 !important;
-	color: green !important;
-	vertical-align: text-top !important;
+/* Timeout label styling */
+.ic-Login__actions-timeout > label {
+	color: green;
+	vertical-align: middle;
 }
 
+/* Forgot password link positioning */
 #login_forgot_password {
-	margin: -31px 7px 0 0 !important;
-	float: right !important;
+	margin-left: auto;
 }
 
+/* Center the form controls */
 #login_form .ic-Form-control--login {
-    margin: 0 auto !important;
+	display: flex;
+	justify-content: center;
+	margin: 0 auto;
 }
 
-/*hide canvas footer links and canvas logo*/
-#footer-links {
-	display: none !important;
-}
-
+/* Hide Canvas default footer elements */
+#footer-links,
 #footer a.ic-Login-footer__logo-link {
-	display: none !important;
+	display: none;
 }
 
-/*custom footer position*/
-P#wms-login-footer {
-	padding: 40px 9px 0 0 !important;
-	text-align: center !important;
-	font-size: 92% !important;
+/* Custom footer styling */
+#wms-login-footer {
+	padding: 2.5rem 0.5rem 0 0;
+	text-align: center;
+	font-size: 0.92rem;
 }
 
-/*custom footer link color*/
-P#wms-login-footer A {
-	color: #666666 !important;
+#wms-login-footer a {
+	color: #666666;
+	text-decoration: none;
+	transition: color 0.3s ease;
 }
 
-/*error alert message holder: set to same width as your login-box above*/
+#wms-login-footer a:hover {
+	color: #500082;
+	text-decoration: underline;
+}
+
+/* Error message container - centered layout */
 #unauthorized_holder {
-	width: 1140px !important;
+	max-width: 1140px;
+	margin: 0 auto;
+	padding: 1rem;
 }
 
-/*error alert message: remove box shadow*/
-/*do not set width, as internal error msgs are negatively affected*/
-#unauthorized_holder, #unauthorized_holder #unauthorized_message {
-	box-shadow: none !important;
-	margin: 0 auto 0 !important;
+/* Error message styling */
+#unauthorized_holder,
+#unauthorized_holder #unauthorized_message {
+	box-shadow: none;
+	border-radius: 4px;
+}
+
+/* Add responsive adjustments */
+@media (max-width: 768px) {
+	.ic-Login {
+		padding: 1rem;
+	}
+
+	.ic-Login__container {
+		margin-top: 300px;
+	}
+
+	#login_form .ic-Form-control--login {
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	#pseudonym_session_unique_id,
+	#pseudonym_session_password {
+		width: 100%;
+		max-width: 300px;
+	}
 }
 
 /**********************************************
